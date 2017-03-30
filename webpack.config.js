@@ -7,10 +7,10 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");  //css单独打�
 module.exports = {
     devtool: 'eval-source-map',
 
-    entry: require(path.resolve(__dirname, 'entry.js')),
+    entry: __dirname + '/src/entry.js', //唯一入口文件
     output: {
-        path: './dist', //打包后的文件存放的地方
-        filename: '[name].js' //打包后输出文件的文件名
+        path: __dirname + '/dist', //打包后的文件存放的地方
+        filename: 'bundle.js' //打包后输出文件的文件名
     },
 
     module: {

@@ -1,7 +1,7 @@
 /**
  * Created by Administrator on 2017-3-21.
  */
-import "../../../css/page/stock_query.scss";
+import "../../css/page/stock-query.scss";
 
 export default class Detail extends React.Component{
     // 构造

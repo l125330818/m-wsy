@@ -5,6 +5,7 @@ import "../../css/page/stock-query.scss";
 import iScrollProbe from "../lib/iscroll-probe";
 import iScroll from "iscroll";
 import ReactIScroll from "react-iscroll";
+import {hashHistory} from "react-router";
 export default class Query extends React.Component{
     // 构造
     constructor(props) {
@@ -24,6 +25,7 @@ export default class Query extends React.Component{
     }
     handleList(e){
         let node =  $(e.target);
+        hashHistory.push("/stockDetail");
         console.log(node.attr("data-info"))
     }
     onScroll(e){
