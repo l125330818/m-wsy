@@ -2,14 +2,39 @@
  * Created by Administrator on 2017-3-21.
  */
 import "../../css/page/stock-query.scss";
+import Util from "../util";
 
 export default class Detail extends React.Component{
     // 构造
       constructor(props) {
         super(props);
         // 初始状态
-        this.state = {};
+        this.state = {
+            stockDetail:[]
+        };
       }
+
+    componentDidMount() {
+        let _this = this;
+        $.ajax({
+            url:Util.commonBaseUrl + "/store/findStoreDetail.htm",
+            type : "get",
+            dataType:"json",
+            data:{d:JSON.stringify({productId:_this.props.id})},
+            success(data){
+                if(data.success){
+                    let stockDetail = data.resultMap.productStoreDOs;
+                    stockDetail.map((item)=>{
+                        item.operateNum = 0;
+                    });
+                    _this.setState({stockDetail});
+                }else{
+                    _this.setState({stockDetail:[]});
+                }
+            }
+
+        })
+    }
     render(){
         return(
             <div>

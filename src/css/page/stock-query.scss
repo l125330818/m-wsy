@@ -3,7 +3,7 @@ html, body, div, h5, h6, p, ul, li {
   padding: 0px;
 }
 html{
-  font-size: 10px;
+  font-size: 14px;
   background-color: #f2f2f2;
 }
 body{
@@ -108,6 +108,12 @@ li {
   float: left;
   border:1px solid #ccc;
   text-align: center;
+}
+.order-list{
+  border:1px solid #ccc;
+  text-align: left;
+  width: 100%;
+  padding: 10px 0 10px 10px;
 }
 .info{
   height:50px;

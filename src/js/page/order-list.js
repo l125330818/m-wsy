@@ -44,7 +44,7 @@ export default class Query extends React.Component{
     }
     handleList(e){
         let node =  $(e.target);
-        hashHistory.push("/OrderList");
+        hashHistory.push("/stockDetail");
         console.log(node.attr("data-info"))
     }
     onScroll(e){
@@ -78,18 +78,19 @@ export default class Query extends React.Component{
                     </div>
 
                     <div>
-                        <div className="clearfix">
+                        <ul className="clearfix">
                                 {
                                     list.map((item,i)=>{
                                         return(
-                                            <div className="stock-list" key = {i} data-info = {item.key} onClick = {this.handleList} >
-                                                <img data-info = {item.key} className="query-img" src={require("../../images/yeoman.png")} alt=""/>
-                                                <p data-info = {item.key}>红色11 骚等我</p>
-                                            </div>
+                                            <li className="order-list" key = {i} data-info = {item.key} onClick = {this.handleList} >
+                                                <p data-info = {item.key}>张哥订货</p>
+                                                <p data-info = {item.key}>交货时间：2017年3月30日 22:36:26</p>
+                                                <p data-info = {item.key}>100双</p>
+                                            </li>
                                         )
                                     })
                                 }
-                        </div>
+                        </ul>
                     </div>
                     <div id="pullUp" className="">
                         <div className="pullUpIcon"></div>
