@@ -13,9 +13,9 @@ export default class Query extends React.Component{
         super(props);
         // 初始状态
         this.state = {
-            list:[{key:1},{key:2},{key:3},{key:4},{key:5},{key:6},{key:7},{key:8},],
-            refreshing:false,
-            pullDownRefresh:false,
+            list:[],
+            refreshing:true,
+            pullDownRefresh:true,
             listRequest:{
                 id : "",
                 classifyId : "",
@@ -30,16 +30,41 @@ export default class Query extends React.Component{
 
     }
     componentDidMount(){
-        console.log(Util.commonBaseUrl)
         this.getList();
+        let winH = $(window).height();
+        $("#scroller").css("min-height",winH+2)
+
+        console.log(winH)
     }
     getList(pageNo=1){
         let {listRequest} = this.state;
+        let _this = this;
         $.ajax({
-            url:Util.commonBaseUrl+"/mobile/store/findStoreList",
+            url:Util.commonBaseUrl+"/mobile/store/findStoreList.htm",
             type:"get",
             dataType:"json",
-            data:{page:pageNo,pageSize:10,d:JSON.stringify(listRequest)}
+            data:{page:pageNo,pageSize:50,d:JSON.stringify(listRequest)},
+            success(data){
+                if(data.success){
+                    _this.setState({
+                        list:data.resultMap.rows,
+                        refreshing:false,
+                        pullDownRefresh:false,
+                    });
+                }else{
+                    _this.setState({
+                        list:[],
+                        refreshing:false,
+                        pullDownRefresh:false,
+                    });
+                }
+            },
+            error(){
+                _this.setState({
+                    refreshing:false,
+                    pullDownRefresh:false,
+                });
+            }
         })
     }
     handleList(e){
@@ -51,16 +76,26 @@ export default class Query extends React.Component{
         console.log(e);
         if(e.y>5){
             this.setState({refreshing:true,pullDownRefresh:true})
+        }else if(e.y<5){
+            this.setState({refreshing:true,pullUpRefresh:true})
         }
     }
     onScrollStart(){}
     refresh(){}
-    end(){}
+    end(){
+        let {pullDownRefresh,refreshing} = this.state;
+        if(pullDownRefresh && refreshing){
+            this.getList();
+        }
+    }
     render(){
-        let {pullDownRefresh,refreshing,list} = this.state;
+        let {pullDownRefresh,pullUpRefresh,refreshing,list} = this.state;
         let pullDownStyle = "none";
+        let pullUpStyle = "none";
         if(pullDownRefresh && refreshing){
             pullDownStyle = "block";
+        }else if(pullUpRefresh && refreshing){
+            pullUpStyle = "block";
         }
         return(
         <div id="wrapper">
@@ -70,7 +105,7 @@ export default class Query extends React.Component{
                           onScroll={this.onScroll}
                           onScrollStart={this.onScrollStart}
                           onScrollEnd={this.end}>
-                <div style={{width: "110%",minHeight:"900px"}} id="scroller">
+                <div id="scroller">
 
                     <div id="pullDown" className={pullDownStyle}>
                         <div className="pullDownIcon"></div>
@@ -80,18 +115,18 @@ export default class Query extends React.Component{
                     <div>
                         <div className="clearfix">
                                 {
-                                    list.map((item,i)=>{
+                                    list.length>0 && list.map((item,i)=>{
                                         return(
-                                            <div className="stock-list" key = {i} data-info = {item.key} onClick = {this.handleList} >
-                                                <img data-info = {item.key} className="query-img" src={require("../../images/yeoman.png")} alt=""/>
-                                                <p data-info = {item.key}>红色11 骚等我</p>
+                                            <div className="stock-list" key = {i} data-info = {item.id} onClick = {this.handleList} >
+                                                <img data-info = {item.id} className="query-img" src={item.url} alt=""/>
+                                                <p data-info = {item.id}>{item.classifyName+item.colour+item.storeTotalNum+"双    "}</p>
                                             </div>
                                         )
                                     })
                                 }
                         </div>
                     </div>
-                    <div id="pullUp" className="">
+                    <div id="pullUp" className={pullUpStyle}>
                         <div className="pullUpIcon"></div>
                         <div className="pullUpLabel">加载更多</div>
                     </div>

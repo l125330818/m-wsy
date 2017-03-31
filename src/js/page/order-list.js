@@ -30,7 +30,7 @@ export default class Query extends React.Component{
 
     }
     componentDidMount(){
-        console.log(Util.commonBaseUrl)
+        console.log("dod")
         this.getList();
     }
     getList(pageNo=1){

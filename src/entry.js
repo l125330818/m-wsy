@@ -2,13 +2,19 @@
  * Created by luojie on 2017/3/27 11:36.
  */
 import { Router, Route, hashHistory } from 'react-router';
-import StockQuery from "./js/page/stock-query";
 import StockDetail from "./js/page/stock-detail";
-import OrderList from "./js/page/order-list";
 ReactDOM.render((
     <Router history={hashHistory}>
-        <Route path='/' component={StockQuery}/>
-        <Route path='/stockDetail' component={StockDetail}/>
-        <Route path='/OrderList' component={OrderList}/>
+
+        <Route path="/" getComponent={function(nextState, cb) {
+                require.ensure([], (require) => {
+                     cb(null, require("./js/page/stock-query"))
+                })
+            }}/>
+        <Route path="/OrderList" getComponent={function(nextState, cb) {
+                require.ensure([], (require) => {
+                     cb(null, require("./js/page/order-list"))
+                })
+            }}/>
     </Router>
 ), document.getElementById('app'));

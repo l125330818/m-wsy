@@ -8,9 +8,15 @@ export default class Query extends React.Component{
         // 初始状态
         this.state = {};
     }
+    query(){
+
+    }
     render(){
         return(
-            <div>1</div>
+            <div>
+                <RUI.Button onClick = {this.query}>订单查询</RUI.Button>
+                <RUI.Button onClick = {this.query}>库存查询</RUI.Button>
+            </div>
         )
     }
 }
