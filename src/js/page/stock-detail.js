@@ -10,17 +10,23 @@ export default class Detail extends React.Component{
         super(props);
         // 初始状态
         this.state = {
-            stockDetail:[]
+            stockDetail:[
+                {shoeNum:0}
+            ]
         };
       }
 
     componentDidMount() {
+        this.getDetail();
+    }
+    getDetail(){
         let _this = this;
+        let productId = this.props.location.query.id;
         $.ajax({
-            url:Util.commonBaseUrl + "/store/findStoreDetail.htm",
+            url:Util.commonBaseUrl + "/mobile/store/findStoreDetail.htm",
             type : "get",
             dataType:"json",
-            data:{d:JSON.stringify({productId:_this.props.id})},
+            data:{d:JSON.stringify({productId})},
             success(data){
                 if(data.success){
                     let stockDetail = data.resultMap.productStoreDOs;
@@ -36,12 +42,13 @@ export default class Detail extends React.Component{
         })
     }
     render(){
+        let {stockDetail} = this.state;
         return(
             <div>
                 <div className="">
                     <div className="info">
                         <label htmlFor="" >产品信息：</label>
-                        <span>111双</span>
+                        <span>{this.props.location.query.name || ""}&nbsp;&nbsp;&nbsp;{stockDetail[0].shoeNum || 0}双</span>
                     </div>
                     <table className="table">
                         <thead>
@@ -52,16 +59,21 @@ export default class Detail extends React.Component{
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>11</td>
-                            <td>22</td>
-                            <td>33</td>
-                        </tr>
-                        <tr>
-                            <td>11</td>
-                            <td>22</td>
-                            <td>33</td>
-                        </tr>
+                        {
+                            stockDetail.length>0 && stockDetail.map((item,index)=>{
+                                let errorStyle = "";
+                                if((item.shoeNum>item.storeMax && item.storeMax!=-1) || item.shoeNum<item.storeMin){
+                                    errorStyle = "bg-red"
+                                }
+                                return(
+                                    <tr key = {index} className={errorStyle}>
+                                        <td>{item.shoeCode}</td>
+                                        <td>{item.shoeNum}</td>
+                                        <td>{(item.storeMin==-1?"无限制":item.storeMin) + "-"+(item.storeMax==-1?"无限制":item.storeMax)}</td>
+                                    </tr>
+                                )
+                            })
+                        }
                         </tbody>
                     </table>
                 </div>

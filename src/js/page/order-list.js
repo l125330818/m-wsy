@@ -7,103 +7,171 @@ import iScroll from "iscroll";
 import ReactIScroll from "react-iscroll";
 import {hashHistory} from "react-router";
 import Util from "../util";
-export default class Query extends React.Component{
+export default class QueryList extends React.Component{
     // 构造
     constructor(props) {
         super(props);
         // 初始状态
         this.state = {
-            list:[{key:1},{key:2},{key:3},{key:4},{key:5},{key:6},{key:7},{key:8},],
-            refreshing:false,
-            pullDownRefresh:false,
+            list:[],
+            refreshing:true,
+            pullDownRefresh:true,
+            pullUpRefresh:false,
             listRequest:{
                 id : "",
                 classifyId : "",
                 status : "",
             },
+            isMore:false,
+            iTotalDisplayRecords:0,
+            pageSize:1,
+            pageNo:1
         };
         this.onScroll = this.onScroll.bind(this);
-        this.onScrollStart = this.onScrollStart.bind(this);
-        this.refresh = this.refresh.bind(this);
         this.end = this.end.bind(this);
         this.handleList = this.handleList.bind(this);
-
     }
     componentDidMount(){
-        console.log("dod")
         this.getList();
+        let winH = $(window).height();
+        let winW = $(window).width();
+        let paddingNum = winW%122;
+        $("#scroller").css("min-height",winH+2);
+    }
+    componentWillUnmount(){
+
+    }
+    isMoreFn(){
+        let {iTotalDisplayRecords,list} = this.state;
+        if(list.length<iTotalDisplayRecords){
+            this.setState({isMore:true});
+        }else{
+            this.setState({isMore:false});
+        }
     }
     getList(pageNo=1){
-        let {listRequest} = this.state;
+        let {listRequest,pageSize} = this.state;
+        let _this = this;
         $.ajax({
-            url:Util.commonBaseUrl+"/mobile/store/findStoreList",
+            url:Util.commonBaseUrl+"/mobile/store/findStoreList.htm",
             type:"get",
             dataType:"json",
-            data:{page:pageNo,pageSize:10,d:JSON.stringify(listRequest)}
+            data:{pageNo:pageNo,pageSize:pageSize,d:JSON.stringify(listRequest)},
+            success(data){
+                if(data.success){
+                    let list = [];
+                    if(pageNo==1){
+                        list = data.resultMap.rows;
+                    }else{
+                        list = _this.state.list.concat(data.resultMap.rows);
+                    }
+                    _this.setState({
+                        list:list,
+                        refreshing:false,
+                        pullDownRefresh:false,
+                        iTotalDisplayRecords:data.resultMap.iTotalDisplayRecords
+                    },()=>{
+                        _this.isMoreFn();
+                    });
+                }else{
+                    _this.setState({
+                        list:[],
+                        refreshing:false,
+                        pullDownRefresh:false,
+                        pullUpRefresh:false,
+                        iTotalDisplayRecords:0,
+                        isMore:false
+                    });
+                }
+            },
+            error(){
+                _this.setState({
+                    refreshing:false,
+                    pullDownRefresh:false,
+                    pullUpRefresh:false,
+                    iTotalDisplayRecords:0,
+                    isMore:false
+                });
+            }
         })
     }
     handleList(e){
         let node =  $(e.target);
-        hashHistory.push("/stockDetail");
-        console.log(node.attr("data-info"))
+        let id = node.attr("data-id");
+        let name = node.attr("data-name");
+        hashHistory.push("/stockDetail?id="+id+"&name="+name);
     }
     onScroll(e){
-        console.log(e);
         if(e.y>5){
             this.setState({refreshing:true,pullDownRefresh:true})
+        }else if(e.y < (e.maxScrollY - 5)){
+            this.setState({refreshing:true,pullUpRefresh:true})
         }
     }
-    onScrollStart(){}
-    refresh(){}
-    end(){}
+    end(){
+        let {pullDownRefresh,refreshing,isMore,pullUpRefresh,pageNo} = this.state;
+        if(pullDownRefresh && refreshing){
+            this.setState({pageNo:1},()=>{
+                this.getList();
+            })
+        }else if(pullUpRefresh && refreshing && isMore){
+            this.setState({pageNo:++pageNo},()=>{
+                this.getList(this.state.pageNo);
+            });
+        }else{
+            this.setState({
+                pullDownRefresh : false,
+                refreshing : false,
+                pullUpRefresh : false,
+            })
+        }
+    }
     render(){
-        let {pullDownRefresh,refreshing,list} = this.state;
+        let {pullDownRefresh,pullUpRefresh,refreshing,list,isMore} = this.state;
         let pullDownStyle = "none";
+        let pullUpStyle = "none";
         if(pullDownRefresh && refreshing){
             pullDownStyle = "block";
+        }else if(pullUpRefresh && refreshing && isMore){
+            pullUpStyle = "block";
         }
         return(
-        <div id="wrapper">
-            <ReactIScroll iScroll={iScrollProbe}
-                          options={this.props.options}
-                          onRefresh={this.refresh}
-                          onScroll={this.onScroll}
-                          onScrollStart={this.onScrollStart}
-                          onScrollEnd={this.end}>
-                <div style={{width: "110%",minHeight:"900px"}} id="scroller">
+            <div id="wrapper">
+                <ReactIScroll iScroll={iScrollProbe}
+                              options={this.props.options}
+                              onScroll={this.onScroll}
+                              onScrollEnd={this.end}>
+                    <div id="scroller">
 
-                    <div id="pullDown" className={pullDownStyle}>
-                        <div className="pullDownIcon"></div>
-                        <div className="pullDownLabel">加载中</div>
-                    </div>
-
-                    <div>
-                        <ul className="clearfix">
-                                {
-                                    list.map((item,i)=>{
-                                        return(
-                                            <li className="order-list" key = {i} data-info = {item.key} onClick = {this.handleList} >
-                                                <p data-info = {item.key}>张哥订货</p>
-                                                <p data-info = {item.key}>交货时间：2017年3月30日 22:36:26</p>
-                                                <p data-info = {item.key}>100双</p>
-                                            </li>
-                                        )
-                                    })
-                                }
+                        <div id="pullDown" className={pullDownStyle}>
+                            <div className="pullDownIcon"></div>
+                            <div className="pullDownLabel">加载中</div>
+                        </div>
+                        <ul className="list-content">
+                            {
+                                list.length>0 && list.map((item,i)=>{
+                                    return(
+                                        <li className="order-list" key = {i} data-info = {item.key} onClick = {this.handleList} >
+                                            <p data-info = {item.key}>张哥订货</p>
+                                            <p data-info = {item.key}>交货时间：2017年3月30日 22:36:26</p>
+                                            <p data-info = {item.key}>100双</p>
+                                        </li>
+                                    )
+                                })
+                            }
                         </ul>
+                        <div id="pullUp" className={pullUpStyle}>
+                            <div className="pullUpIcon"></div>
+                            <div className="pullUpLabel">加载更多</div>
+                        </div>
                     </div>
-                    <div id="pullUp" className="">
-                        <div className="pullUpIcon"></div>
-                        <div className="pullUpLabel">加载更多</div>
-                    </div>
-                </div>
-            </ReactIScroll>
-        </div>
+                </ReactIScroll>
+            </div>
 
         )
     }
 }
-Query.defaultProps = {
+QueryList.defaultProps = {
     options: {
         probeType: 2,
         scrollbars: false,
@@ -115,4 +183,3 @@ Query.defaultProps = {
         momentum:true
     }
 }
-ReactDOM.render(<Query />,document.getElementById("app"));

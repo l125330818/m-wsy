@@ -1,7 +1,8 @@
 /**
  * Created by Administrator on 2017-3-21.
  */
-export default class Query extends React.Component{
+import RUI from "react-component-lib";
+export default class Index extends React.Component{
     // 构造
     constructor(props) {
         super(props);
@@ -20,4 +21,4 @@ export default class Query extends React.Component{
         )
     }
 }
-ReactDOM.render(<Query />,document.getElementById("app"));
+ReactDOM.render(<Index />,document.getElementById("app"));

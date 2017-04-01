@@ -3,7 +3,7 @@ html, body, div, h5, h6, p, ul, li {
   padding: 0px;
 }
 html{
-  font-size: 14px;
+  font-size: 12px;
   background-color: #f2f2f2;
 }
 body{
@@ -11,6 +11,7 @@ body{
 }
 body,html{
   height: 100%;
+  overflow: hidden;
 }
 ul{
   list-style: none;
@@ -109,12 +110,14 @@ li {
   border:1px solid #ccc;
   text-align: center;
   height:110px;
+  width:110px;
+  padding: 10px 0;
 }
 .order-list{
   border:1px solid #ccc;
   text-align: left;
-  width: 100%;
   padding: 10px 0 10px 10px;
+  margin-top: 10px;
 }
 .info{
   height:50px;
@@ -122,6 +125,7 @@ li {
   text-align: center;
 }
 .table{
+  background-color: #fff;
   width: 100%;
   border-collapse: collapse;
   text-align: center;
@@ -134,4 +138,12 @@ li {
     border:1px solid #ccc;
     height:40px;
   }
+}
+.bg-red{
+  background-color: red;
+}
+.list-content{
+  box-sizing:border-box;
+  padding: 0 10px;
+  width: 100%;
 }

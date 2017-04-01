@@ -7,7 +7,7 @@ import iScroll from "iscroll";
 import ReactIScroll from "react-iscroll";
 import {hashHistory} from "react-router";
 import Util from "../util";
-export default class Query extends React.Component{
+export default class QueryList extends React.Component{
     // 构造
     constructor(props) {
         super(props);
@@ -16,46 +16,72 @@ export default class Query extends React.Component{
             list:[],
             refreshing:true,
             pullDownRefresh:true,
+            pullUpRefresh:false,
             listRequest:{
                 id : "",
                 classifyId : "",
                 status : "",
             },
+            isMore:false,
+            iTotalDisplayRecords:0,
+            pageSize:1,
+            pageNo:1
         };
         this.onScroll = this.onScroll.bind(this);
-        this.onScrollStart = this.onScrollStart.bind(this);
-        this.refresh = this.refresh.bind(this);
         this.end = this.end.bind(this);
         this.handleList = this.handleList.bind(this);
-
     }
     componentDidMount(){
         this.getList();
         let winH = $(window).height();
-        $("#scroller").css("min-height",winH+2)
+        let winW = $(window).width();
+        let paddingNum = winW%122;
+        $("#scroller").css("min-height",winH+2);
+        $("#list-content").css("padding-left",paddingNum/2);
+    }
+    componentWillUnmount(){
 
-        console.log(winH)
+    }
+    isMoreFn(){
+        let {iTotalDisplayRecords,list} = this.state;
+        if(list.length<iTotalDisplayRecords){
+            this.setState({isMore:true});
+        }else{
+            this.setState({isMore:false});
+        }
     }
     getList(pageNo=1){
-        let {listRequest} = this.state;
+        let {listRequest,pageSize} = this.state;
         let _this = this;
         $.ajax({
             url:Util.commonBaseUrl+"/mobile/store/findStoreList.htm",
             type:"get",
             dataType:"json",
-            data:{page:pageNo,pageSize:50,d:JSON.stringify(listRequest)},
+            data:{pageNo:pageNo,pageSize:pageSize,d:JSON.stringify(listRequest)},
             success(data){
                 if(data.success){
+                    let list = [];
+                    if(pageNo==1){
+                        list = data.resultMap.rows;
+                    }else{
+                        list = _this.state.list.concat(data.resultMap.rows);
+                    }
                     _this.setState({
-                        list:data.resultMap.rows,
+                        list:list,
                         refreshing:false,
                         pullDownRefresh:false,
+                        iTotalDisplayRecords:data.resultMap.iTotalDisplayRecords
+                    },()=>{
+                        _this.isMoreFn();
                     });
                 }else{
                     _this.setState({
                         list:[],
                         refreshing:false,
                         pullDownRefresh:false,
+                        pullUpRefresh:false,
+                        iTotalDisplayRecords:0,
+                        isMore:false
                     });
                 }
             },
@@ -63,47 +89,58 @@ export default class Query extends React.Component{
                 _this.setState({
                     refreshing:false,
                     pullDownRefresh:false,
+                    pullUpRefresh:false,
+                    iTotalDisplayRecords:0,
+                    isMore:false
                 });
             }
         })
     }
     handleList(e){
         let node =  $(e.target);
-        hashHistory.push("/OrderList");
-        console.log(node.attr("data-info"))
+        let id = node.attr("data-id");
+        let name = node.attr("data-name");
+        hashHistory.push("/orderList?id="+id+"&name="+name);
     }
     onScroll(e){
-        console.log(e);
         if(e.y>5){
             this.setState({refreshing:true,pullDownRefresh:true})
-        }else if(e.y<5){
+        }else if(e.y < (e.maxScrollY - 5)){
             this.setState({refreshing:true,pullUpRefresh:true})
         }
     }
-    onScrollStart(){}
-    refresh(){}
     end(){
-        let {pullDownRefresh,refreshing} = this.state;
+        let {pullDownRefresh,refreshing,isMore,pullUpRefresh,pageNo} = this.state;
         if(pullDownRefresh && refreshing){
-            this.getList();
+            this.setState({pageNo:1},()=>{
+                this.getList();
+            })
+        }else if(pullUpRefresh && refreshing && isMore){
+            this.setState({pageNo:++pageNo},()=>{
+               this.getList(this.state.pageNo);
+            });
+        }else{
+            this.setState({
+                pullDownRefresh : false,
+                refreshing : false,
+                pullUpRefresh : false,
+            })
         }
     }
     render(){
-        let {pullDownRefresh,pullUpRefresh,refreshing,list} = this.state;
+        let {pullDownRefresh,pullUpRefresh,refreshing,list,isMore} = this.state;
         let pullDownStyle = "none";
         let pullUpStyle = "none";
         if(pullDownRefresh && refreshing){
             pullDownStyle = "block";
-        }else if(pullUpRefresh && refreshing){
+        }else if(pullUpRefresh && refreshing && isMore){
             pullUpStyle = "block";
         }
         return(
         <div id="wrapper">
             <ReactIScroll iScroll={iScrollProbe}
                           options={this.props.options}
-                          onRefresh={this.refresh}
                           onScroll={this.onScroll}
-                          onScrollStart={this.onScrollStart}
                           onScrollEnd={this.end}>
                 <div id="scroller">
 
@@ -111,20 +148,22 @@ export default class Query extends React.Component{
                         <div className="pullDownIcon"></div>
                         <div className="pullDownLabel">加载中</div>
                     </div>
-
-                    <div>
-                        <div className="clearfix">
-                                {
-                                    list.length>0 && list.map((item,i)=>{
-                                        return(
-                                            <div className="stock-list" key = {i} data-info = {item.id} onClick = {this.handleList} >
-                                                <img data-info = {item.id} className="query-img" src={item.url} alt=""/>
-                                                <p data-info = {item.id}>{item.classifyName+item.colour+item.storeTotalNum+"双    "}</p>
-                                            </div>
-                                        )
-                                    })
-                                }
-                        </div>
+                    <div className="clearfix" id = "list-content">
+                            {
+                                list.length>0 && list.map((item,i)=>{
+                                    return(
+                                        <div className="stock-list" key = {i}
+                                             data-id = {item.id}
+                                             data-name = {item.name}
+                                             onClick = {this.handleList} >
+                                            <img data-id = {item.id}
+                                                 data-name = {item.name}
+                                                 className="query-img" src={item.url} alt=""/>
+                                            <p data-id = {item.id} data-name = {item.name}>{item.name+item.storeTotalNum+"双    "}</p>
+                                        </div>
+                                    )
+                                })
+                            }
                     </div>
                     <div id="pullUp" className={pullUpStyle}>
                         <div className="pullUpIcon"></div>
@@ -137,7 +176,7 @@ export default class Query extends React.Component{
         )
     }
 }
-Query.defaultProps = {
+QueryList.defaultProps = {
     options: {
         probeType: 2,
         scrollbars: false,
@@ -149,4 +188,3 @@ Query.defaultProps = {
         momentum:true
     }
 }
-ReactDOM.render(<Query />,document.getElementById("app"));
