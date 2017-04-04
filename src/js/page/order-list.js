@@ -17,11 +17,7 @@ export default class QueryList extends React.Component{
             refreshing:true,
             pullDownRefresh:true,
             pullUpRefresh:false,
-            listRequest:{
-                id : "",
-                classifyId : "",
-                status : "",
-            },
+            listRequest:{},
             isMore:false,
             iTotalDisplayRecords:0,
             pageSize:1,
@@ -53,7 +49,7 @@ export default class QueryList extends React.Component{
         let {listRequest,pageSize} = this.state;
         let _this = this;
         $.ajax({
-            url:Util.commonBaseUrl+"/mobile/store/findStoreList.htm",
+            url:Util.commonBaseUrl+"/mobile/order/findOrderList.htm",
             type:"get",
             dataType:"json",
             data:{pageNo:pageNo,pageSize:pageSize,d:JSON.stringify(listRequest)},
@@ -97,9 +93,8 @@ export default class QueryList extends React.Component{
     }
     handleList(e){
         let node =  $(e.target);
-        let id = node.attr("data-id");
-        let name = node.attr("data-name");
-        hashHistory.push("/stockDetail?id="+id+"&name="+name);
+        let id = node.attr("data-info");
+        hashHistory.push("/orderDetail?id="+id);
     }
     onScroll(e){
         if(e.y>5){
@@ -151,10 +146,10 @@ export default class QueryList extends React.Component{
                             {
                                 list.length>0 && list.map((item,i)=>{
                                     return(
-                                        <li className="order-list" key = {i} data-info = {item.key} onClick = {this.handleList} >
-                                            <p data-info = {item.key}>张哥订货</p>
-                                            <p data-info = {item.key}>交货时间：2017年3月30日 22:36:26</p>
-                                            <p data-info = {item.key}>100双</p>
+                                        <li className="order-list" key = {i} data-info = {item.orderNo} onClick = {this.handleList} >
+                                            <p data-info = {item.orderNo}>{item.orderName}</p>
+                                            <p data-info = {item.orderNo}>交货时间：{item.deliveryTime}</p>
+                                            <p data-info = {item.orderNo}>{item.orderNum}双</p>
                                         </li>
                                     )
                                 })

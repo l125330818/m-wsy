@@ -15,6 +15,11 @@ ReactDOM.render((
                      cb(null, require("./js/page/order-list"))
                 })
             }}/>
+        <Route path="/orderDetail" getComponent={function(nextState, cb) {
+                require.ensure([], (require) => {
+                     cb(null, require("./js/page/order-detail"))
+                })
+            }}/>
         <Route path="/stockDetail" getComponent={function(nextState, cb) {
                 require.ensure([], (require) => {
                      cb(null, require("./js/page/stock-detail"))

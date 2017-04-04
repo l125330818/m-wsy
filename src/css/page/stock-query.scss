@@ -11,7 +11,7 @@ body{
 }
 body,html{
   height: 100%;
-  overflow: hidden;
+  overflow: scroll;
 }
 ul{
   list-style: none;
@@ -146,4 +146,24 @@ li {
   box-sizing:border-box;
   padding: 0 10px;
   width: 100%;
+}
+.detail-title{
+  line-height: 30px;
+  text-align: center;
+  background-color: #f2f2f2;
+  border:1px solid #ccc;
+  border-left: none;
+  border-right:none;
+  margin-top: 10px;
+}
+.order-content{
+  padding:15px;
+}
+.m-b-20{
+  margin-bottom:10px;
+}
+.detail-img{
+  height:80px;
+  width:80px;
+  vertical-align: middle;
 }
