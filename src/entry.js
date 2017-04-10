@@ -4,8 +4,12 @@
 import { Router, Route, hashHistory } from 'react-router';
 ReactDOM.render((
     <Router history={hashHistory}>
-
         <Route path="/" getComponent={function(nextState, cb) {
+                require.ensure([], (require) => {
+                     cb(null, require("./js/page/index"))
+                })
+            }}/>
+        <Route path="/stockQuery" getComponent={function(nextState, cb) {
                 require.ensure([], (require) => {
                      cb(null, require("./js/page/stock-query"))
                 })

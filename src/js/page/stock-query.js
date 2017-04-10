@@ -100,7 +100,7 @@ export default class QueryList extends React.Component{
         let node =  $(e.target);
         let id = node.attr("data-id");
         let name = node.attr("data-name");
-        hashHistory.push("/orderList?id="+id+"&name="+name);
+        hashHistory.push("/stockDetail?id="+id+"&name="+name);
     }
     onScroll(e){
         if(e.y>5){
