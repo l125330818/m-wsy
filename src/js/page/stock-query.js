@@ -6,6 +6,7 @@ import iScrollProbe from "../lib/iscroll-probe";
 import iScroll from "iscroll";
 import ReactIScroll from "react-iscroll";
 import {hashHistory} from "react-router";
+import RUI from "react-component-lib";
 import Util from "../util";
 export default class QueryList extends React.Component{
     // 构造
@@ -25,19 +26,23 @@ export default class QueryList extends React.Component{
             isMore:false,
             iTotalDisplayRecords:0,
             pageSize:1,
-            pageNo:1
+            pageNo:1,
+            productSelect : [{key:"全部",value:""}],
         };
         this.onScroll = this.onScroll.bind(this);
         this.end = this.end.bind(this);
         this.handleList = this.handleList.bind(this);
+        this.listSelect = this.listSelect.bind(this);
     }
     componentDidMount(){
         this.getList();
+        this.productList();
         let winH = $(window).height();
         let winW = $(window).width();
         let paddingNum = winW%122;
+        let imgW =(winW-60)/2;
         $("#scroller").css("min-height",winH+2);
-        $("#list-content").css("padding-left",paddingNum/2);
+        //$("#list-content").css("padding-left",paddingNum/2);
     }
     componentWillUnmount(){
 
@@ -49,6 +54,28 @@ export default class QueryList extends React.Component{
         }else{
             this.setState({isMore:false});
         }
+    }
+    productList(){
+        let _this = this;
+        let {productSelect} = this.state;
+        $.ajax({
+            url:Util.commonBaseUrl+"/mobile/product/findByPage.htm",
+            type:"get",
+            dataType:"json",
+            data:{d:JSON.stringify({classifyId:"",name:""}),pageNo:1,pageSize:20000},
+            success(data){
+                if(data.success){
+                    let rows = data.resultMap.rows;
+                    rows && rows.map((item)=>{
+                        productSelect.push({key:item.name,value:item.id})
+                    });
+                    _this.setState({productSelect});
+                }else{
+                    productSelect = [{key:"全部",value:""}];
+                    _this.setState({productSelect});
+                }
+            }
+        })
     }
     getList(pageNo=1){
         let {listRequest,pageSize} = this.state;
@@ -127,8 +154,16 @@ export default class QueryList extends React.Component{
             })
         }
     }
+    listSelect(e){
+
+        let {listRequest} = this.state;
+        listRequest.id = e.value;
+        this.setState({pageNo:1,listRequest},()=>{
+            this.getList();
+        });
+    }
     render(){
-        let {pullDownRefresh,pullUpRefresh,refreshing,list,isMore} = this.state;
+        let {pullDownRefresh,pullUpRefresh,refreshing,list,isMore,productSelect} = this.state;
         let pullDownStyle = "none";
         let pullUpStyle = "none";
         if(pullDownRefresh && refreshing){
@@ -136,6 +171,9 @@ export default class QueryList extends React.Component{
         }else if(pullUpRefresh && refreshing && isMore){
             pullUpStyle = "block";
         }
+        let winW = $(window).width();
+        let imgW =(winW-84)/2;
+        let selectW = winW-22;
         return(
         <div id="wrapper">
             <ReactIScroll iScroll={iScrollProbe}
@@ -148,6 +186,15 @@ export default class QueryList extends React.Component{
                         <div className="pullDownIcon"></div>
                         <div className="pullDownLabel">加载中</div>
                     </div>
+                    <RUI.Select
+                        data={productSelect}
+                        value={{key:'全部',value:''}}
+                        stuff={true}
+                        event = "click"
+                        style = {{width:selectW,margin:"10px"}}
+                        callback = {this.listSelect}
+                        className="rui-theme-1 w-120">
+                    </RUI.Select>
                     <div className="clearfix" id = "list-content">
                             {
                                 list.length>0 && list.map((item,i)=>{
@@ -158,8 +205,10 @@ export default class QueryList extends React.Component{
                                              onClick = {this.handleList} >
                                             <img data-id = {item.id}
                                                  data-name = {item.name}
+                                                 style = {{width:imgW}}
                                                  className="query-img" src={item.url} alt=""/>
-                                            <p data-id = {item.id} data-name = {item.name}>{item.name+item.storeTotalNum+"双    "}</p>
+                                            <p  style = {{width:imgW}} className="over" data-id = {item.id} data-name = {item.name}>{item.name}</p>
+                                            <p data-id = {item.id} data-name = {item.name}>{item.storeTotalNum+"双    "}</p>
                                         </div>
                                     )
                                 })

@@ -121,6 +121,9 @@ export default class QueryList extends React.Component{
             })
         }
     }
+    getStr(str){
+        return str.substr(0,10);
+    }
     render(){
         let {pullDownRefresh,pullUpRefresh,refreshing,list,isMore} = this.state;
         let pullDownStyle = "none";
@@ -146,10 +149,18 @@ export default class QueryList extends React.Component{
                             {
                                 list.length>0 && list.map((item,i)=>{
                                     return(
-                                        <li className="order-list" key = {i} data-info = {item.orderNo} onClick = {this.handleList} >
-                                            <p data-info = {item.orderNo}>{item.orderName}</p>
-                                            <p data-info = {item.orderNo}>交货时间：{item.deliveryTime}</p>
-                                            <p data-info = {item.orderNo}>{item.orderNum}双</p>
+                                        <li className="order-list relative clearfix" key = {i} data-info = {item.orderNo} onClick = {this.handleList} >
+                                            <img src={item.orderPic} className="order-img" alt=""/>
+                                            <div className="order-info">
+                                                <p className="over" data-info = {item.orderNo}>{item.orderName}</p>
+                                                <p className="over" data-info = {item.orderNo}>交货时间：{this.getStr(item.deliveryTime)}</p>
+                                                <p className="over" data-info = {item.orderNo}>双数：{item.orderNum}双</p>
+                                                <p className="over" data-info = {item.orderNo}>剩余：{item.residueTime}天</p>
+                                            </div>
+                                            {
+                                                item.isUrgent==1&&
+                                                <i className="circle"/>
+                                            }
                                         </li>
                                     )
                                 })

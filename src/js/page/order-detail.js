@@ -90,17 +90,17 @@ export default class Detail extends React.Component{
 
         return(
             <div>
-                <div><span>订单编号：{lastData.orderNo}</span></div>
-                <div><span>订单名称：{lastData.orderName}</span></div>
-                <div><span>是否加急：{lastData.isUrgent==1?"是":"否"}</span></div>
-                <div><span>交货时间：{lastData.deliveryTime}</span></div>
-                <div><span>创建时间：{lastData.createTime}</span></div>
-                <div><span>裁剪完成时间：{lastData.tailorFinishTime}</span></div>
-                <div><span>机车分配时间：{lastData.vampHandleTime}</span></div>
-                <div><span>机车完成时间：{lastData.vampFinishTime}</span></div>
-                <div><span>底工分配时间：{lastData.soleHandleTime}</span></div>
-                <div><span>底工完成时间：{lastData.soleFinishTime}</span></div>
-                <div><span>质检完成时间：{lastData.qcFinishTime}</span></div>
+                <div className="p-l-10 p-t-20"><span>订单编号：{lastData.orderNo}</span></div>
+                <div className="p-l-10"><span>订单名称：{lastData.orderName}</span></div>
+                <div className="p-l-10"><span>是否加急：{lastData.isUrgent==1?"是":"否"}</span></div>
+                <div className="p-l-10"><span>交货时间：{lastData.deliveryTime}</span></div>
+                <div className="p-l-10"><span>创建时间：{lastData.createTime}</span></div>
+                <div className="p-l-10"><span>裁剪完成时间：{lastData.tailorFinishTime}</span></div>
+                <div className="p-l-10"><span>机车分配时间：{lastData.vampHandleTime}</span></div>
+                <div className="p-l-10"><span>机车完成时间：{lastData.vampFinishTime}</span></div>
+                <div className="p-l-10"><span>底工分配时间：{lastData.soleHandleTime}</span></div>
+                <div className="p-l-10"><span>底工完成时间：{lastData.soleFinishTime}</span></div>
+                <div className="p-l-10"><span>质检完成时间：{lastData.qcFinishTime}</span></div>
                 <div >
                     <div className = "detail-title">上案分配情况</div>
                     <div className="order-content clearfix">
@@ -108,10 +108,13 @@ export default class Detail extends React.Component{
                             lastProduceOrderProductVOs.map((item,index)=>{
                                 return(
                                     <div className="list" key = {index}>
-                                        <div className = "m-b-20">
-                                            <label htmlFor="" className = "left-label"><i className="require">*</i>生产样图：</label>
-                                            <img src={item.productUrl} onClick = {this.clickImg} className="detail-img" alt=""/>
-                                        </div>
+                                        {
+                                            item.productUrl!="" &&
+                                            <div className = "m-b-20">
+                                                <label htmlFor="" className = "left-label"><i className="require">*</i>生产样图：</label>
+                                                <img src={item.productUrl} onClick = {this.clickImg} className="detail-img" alt=""/>
+                                            </div>
+                                        }
                                         <div className="m-b-20">
                                             <label>产品名称：</label><span>{item.productName}</span>
                                         </div>
@@ -158,10 +161,13 @@ export default class Detail extends React.Component{
                             nextProduceOrderProductVOs.map((item,index)=>{
                                 return(
                                     <div className="list" key = {index}>
-                                        <div className = "m-b-20">
-                                            <label htmlFor="" className = "left-label"><i className="require">*</i>生产样图：</label>
-                                            <img src={item.productUrl} onClick = {this.clickImg} className="detail-img" alt=""/>
-                                        </div>
+                                        {
+                                            item.productUrl!="" &&
+                                            <div className = "m-b-20">
+                                                <label htmlFor="" className = "left-label"><i className="require">*</i>生产样图：</label>
+                                                <img src={item.productUrl} onClick = {this.clickImg} className="detail-img" alt=""/>
+                                            </div>
+                                        }
                                         <div className="m-b-20">
                                             <label>产品名称：</label><span>{item.productName}</span>
                                         </div>

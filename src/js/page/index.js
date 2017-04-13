@@ -17,10 +17,16 @@ export default class Index extends React.Component{
         hashHistory.push(url);
     }
     render(){
+        let winH = $(window).height();
+        let buttonH = (winH-44)/2;
         return(
             <div className="p-10">
-                <RUI.Button className = "primary query-btn width-100" onClick = {this.query.bind(this,1)}>订单查询</RUI.Button>
-                <RUI.Button className = "primary query-btn width-100" onClick = {this.query.bind(this,2)}>库存查询</RUI.Button>
+                <RUI.Button className = "primary query-btn width-100"
+                            style = {{height:buttonH,lineHeight:(buttonH+"px")}}
+                            onClick = {this.query.bind(this,1)}>订单查询</RUI.Button>
+                <RUI.Button className = "primary query-btn width-100"
+                            style = {{height:buttonH,lineHeight:(buttonH+"px")}}
+                            onClick = {this.query.bind(this,2)}>库存查询</RUI.Button>
             </div>
         )
     }
