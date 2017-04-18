@@ -43,12 +43,13 @@ export default class Detail extends React.Component{
     }
     render(){
         let {stockDetail} = this.state;
+        let number = this.props.location.query.number;
         return(
             <div>
                 <div className="">
                     <div className="info">
                         <label htmlFor="" >产品信息：</label>
-                        <span>{this.props.location.query.name || ""}&nbsp;&nbsp;&nbsp;{stockDetail[0].shoeNum || 0}双</span>
+                        <span>{this.props.location.query.name || ""}&nbsp;&nbsp;&nbsp;{number || 0}双</span>
                     </div>
                     <table className="table">
                         <thead>

@@ -25,7 +25,7 @@ export default class QueryList extends React.Component{
             },
             isMore:false,
             iTotalDisplayRecords:0,
-            pageSize:1,
+            pageSize:10,
             pageNo:1,
             productSelect : [{key:"全部",value:""}],
         };
@@ -127,7 +127,8 @@ export default class QueryList extends React.Component{
         let node =  $(e.target);
         let id = node.attr("data-id");
         let name = node.attr("data-name");
-        hashHistory.push("/stockDetail?id="+id+"&name="+name);
+        let number = node.attr("data-number");
+        hashHistory.push("/stockDetail?id="+id+"&name="+name+"&number="+number);
     }
     onScroll(e){
         if(e.y>5){
@@ -202,13 +203,15 @@ export default class QueryList extends React.Component{
                                         <div className="stock-list" key = {i}
                                              data-id = {item.id}
                                              data-name = {item.name}
+                                             data-number = {item.storeTotalNum}
                                              onClick = {this.handleList} >
                                             <img data-id = {item.id}
                                                  data-name = {item.name}
                                                  style = {{width:imgW}}
+                                                 data-number = {item.storeTotalNum}
                                                  className="query-img" src={item.url} alt=""/>
-                                            <p  style = {{width:imgW}} className="over" data-id = {item.id} data-name = {item.name}>{item.name}</p>
-                                            <p data-id = {item.id} data-name = {item.name}>{item.storeTotalNum+"双    "}</p>
+                                            <p  style = {{width:imgW}} className="over" data-id = {item.id}  data-number = {item.storeTotalNum} data-name = {item.name}>{item.name}</p>
+                                            <p data-id = {item.id} data-name = {item.name}  data-number = {item.storeTotalNum}>{item.storeTotalNum+"双    "}</p>
                                         </div>
                                     )
                                 })

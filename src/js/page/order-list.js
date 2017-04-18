@@ -20,7 +20,7 @@ export default class QueryList extends React.Component{
             listRequest:{},
             isMore:false,
             iTotalDisplayRecords:0,
-            pageSize:1,
+            pageSize:10,
             pageNo:1
         };
         this.onScroll = this.onScroll.bind(this);
